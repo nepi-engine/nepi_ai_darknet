@@ -1,0 +1,1 @@
+The nepi_darknet_ros_node is built as part of the nepi_3rd_party/nepi_darknet_ros package
