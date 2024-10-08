@@ -30,26 +30,28 @@ AI_DICT = dict(
     pkg_name = 'nepi_darknet_ros',
     class_name = 'DarknetAIF',
     node_file = 'nepi_darknet_ros',
-    node_name = 'nepi_darknet_ros',
+    node_name = 'darknet_ros',
     launch_file = 'darknet_ros.launch',
     models_folder = 'darknet_ros',
     model_prefix = 'darknet_',
 )
 
 class DarknetAIF(object):
-    def __init__(self, ai_dict,node_namespace, models_lib_path):
-      if node_namespace[-1] == "/":
-        node_namespace = node_namespace[:-1]
-      self.node_namespace = node_namespace
+    def __init__(self, ai_dict, node_base_namespace, models_lib_path):
+      #rospy.logwarn("Darknet IF got ai_dict: " + str(ai_dict))
+      if node_base_namespace[-1] == "/":
+        node_base_namespace = node_base_namespace[:-1]
+      self.node_base_namespace = node_base_namespace
       self.models_lib_path = models_lib_path
       self.pkg_name = ai_dict['pkg_name']
       self.node_name = ai_dict['node_name']
+      self.node_file = ai_dict['node_file']
       self.launch_file = ai_dict['launch_file']
       self.model_prefix = ai_dict['model_prefix']
       self.models_folder = ai_dict['models_folder']
       self.models_folder_path =  os.path.join(self.models_lib_path, self.models_folder)
-      rospy.logwarn("Darknet models path: " + self.models_folder_path)
-      threshold_namespace = self.node_namespace + '/nepi_darknet_ros/set_threshold'
+      #rospy.logwarn("Darknet models path: " + self.models_folder_path)
+      threshold_namespace = self.node_base_namespace + '/' + self.node_name + '/set_threshold'
       self.set_threshold_pub = rospy.Publisher(threshold_namespace, Float32, queue_size=1, latch=True)
 
 
@@ -66,60 +68,69 @@ class DarknetAIF(object):
         cfg_path_config_folder = os.path.join(self.models_folder_path, 'config')
         rospy.loginfo("Darknet looking for models config files in folder: " + cfg_path_config_folder)
         # Grab the list of all existing darknet cfg files
-        self.cfg_files = glob.glob(os.path.join(cfg_path_config_folder,'*.yaml'))
-        # Remove the ros.yaml file -- that one doesn't represent a selectable trained neural net
-        try:
-            self.cfg_files.remove(os.path.join(cfg_path_config_folder,'ros.yaml'))
-        except:
-            rospy.logwarn("Unexpected: ros.yaml is missing from the darknet config path " + cfg_path_config_folder)
+        if os.path.exists(cfg_path_config_folder) == False:
+            rospy.loginfo("Yolov5: Failed to find models config files in folder: " + cfg_path_config_folder)
+            return models_dict
+        else:
+            self.cfg_files = glob.glob(os.path.join(cfg_path_config_folder,'*.yaml'))
+            # Remove the ros.yaml file -- that one doesn't represent a selectable trained neural net
+            try:
+                self.cfg_files.remove(os.path.join(cfg_path_config_folder,'ros.yaml'))
+            except:
+                rospy.logwarn("Unexpected: ros.yaml is missing from the darknet config path " + cfg_path_config_folder)
 
-        for f in self.cfg_files:
-            yaml_stream = open(f, 'r')
-            # Validate that it is a proper config file and gather weights file size info for load-time estimates
-            cfg_dict = yaml.load(yaml_stream)
-            #rospy.logwarn("" + str(cfg_dict))
-            
-            yaml_stream.close()
-            if ("yolo_model" not in cfg_dict) or ("weight_file" not in cfg_dict["yolo_model"]) or ("name" not in cfg_dict["yolo_model"]["weight_file"]):
-                rospy.logwarn("Debug: " + str(cfg_dict))
-                rospy.logwarn("File does not appear to be a valid A/I model config file: " + f + "... not adding this classifier")
-                continue
-
-
-            classifier_name = os.path.splitext(os.path.basename(f))[0]
-            weight_file = os.path.join(self.models_folder_path , "yolo_network_config", "weights",cfg_dict["yolo_model"]["weight_file"]["name"])
-            if not os.path.exists(weight_file):
-                rospy.logwarn("Classifier " + classifier_name + " specifies non-existent weights file " + weight_file + "... not adding this classifier")
-                continue
-            classifier_keys = list(cfg_dict.keys())
-            classifier_key = classifier_keys[0]
-            classifier_classes_list.append(cfg_dict[classifier_key]['detection_classes']['names'])
-            #rospy.logwarn("classes: " + str(classifier_classes_list))
-            classifier_name_list.append(classifier_name)
-            classifier_size_list.append(os.path.getsize(weight_file))
-        for i,name in enumerate(classifier_name_list):
-            model_name = self.model_prefix + name
-            model_dict = dict()
-            model_dict['name'] = name
-            model_dict['size'] = classifier_size_list[i]
-            model_dict['classes'] = classifier_classes_list[i]
-            models_dict[model_name] = model_dict
-        #rospy.logwarn("Classifier returning models dict" + str(models_dict))
-        return models_dict
+            for f in self.cfg_files:
+                yaml_stream = open(f, 'r')
+                # Validate that it is a proper config file and gather weights file size info for load-time estimates
+                cfg_dict = yaml.load(yaml_stream)
+                #rospy.logwarn("" + str(cfg_dict))
+                
+                yaml_stream.close()
+                if ("yolo_model" not in cfg_dict) or ("weight_file" not in cfg_dict["yolo_model"]) or ("name" not in cfg_dict["yolo_model"]["weight_file"]):
+                    rospy.logwarn("Debug: " + str(cfg_dict))
+                    rospy.logwarn("File does not appear to be a valid A/I model config file: " + f + "... not adding this classifier")
+                    continue
 
 
-    def startClassifier(self, classifier, input_img, threshold):
+                classifier_name = os.path.splitext(os.path.basename(f))[0]
+                weight_file = os.path.join(self.models_folder_path , "yolo_network_config", "weights",cfg_dict["yolo_model"]["weight_file"]["name"])
+                if not os.path.exists(weight_file):
+                    rospy.logwarn("Classifier " + classifier_name + " specifies non-existent weights file " + weight_file + "... not adding this classifier")
+                    continue
+                classifier_keys = list(cfg_dict.keys())
+                classifier_key = classifier_keys[0]
+                classifier_classes_list.append(cfg_dict[classifier_key]['detection_classes']['names'])
+                #rospy.logwarn("classes: " + str(classifier_classes_list))
+                classifier_name_list.append(classifier_name)
+                classifier_size_list.append(os.path.getsize(weight_file))
+            for i,name in enumerate(classifier_name_list):
+                model_name = self.model_prefix + name
+                model_dict = dict()
+                model_dict['name'] = name
+                model_dict['size'] = classifier_size_list[i]
+                model_dict['classes'] = classifier_classes_list[i]
+                models_dict[model_name] = model_dict
+            #rospy.logwarn("Classifier returning models dict" + str(models_dict))
+            return models_dict
+
+
+    def startClassifier(self, classifier, source_img_topic, threshold):
         # Build Darknet new classifier launch command
+
         launch_cmd_line = [
             "roslaunch", self.pkg_name, self.launch_file,
-            "namespace:=" + self.node_namespace, 
-            "weights_path:=" + os.path.join(self.models_folder_path, "yolo_network_config/weights"),
-            "config_path:=" + os.path.join(self.models_folder_path, "yolo_network_config/cfg"),
+            "pkg_name:=" + self.pkg_name,
+            "namespace:=" + self.node_base_namespace, 
+            "node_name:=" + self.node_name,
+            "node_file:=" + self.node_file,
+            "yolo_weights_path:=" + os.path.join(self.models_folder_path, "yolo_network_config/weights"),
+            "yolo_config_path:=" + os.path.join(self.models_folder_path, "yolo_network_config/cfg"),
             "ros_param_file:=" + os.path.join(self.models_folder_path, "config/ros.yaml"),
             "network_param_file:=" + os.path.join(self.models_folder_path, "config", classifier + ".yaml"),
-            "input_img:=" + input_img,
-            "detector_threshold:=" + str(threshold)
+            "input_img:=" + source_img_topic,
+            "detection_threshold:=" + str(threshold)
         ]
+        
         rospy.loginfo("Launching Darknet ROS Process: " + str(launch_cmd_line))
         self.ros_process = subprocess.Popen(launch_cmd_line)
         
