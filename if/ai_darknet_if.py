@@ -37,11 +37,11 @@ AI_DICT = dict(
 )
 
 class DarknetAIF(object):
-    def __init__(self, ai_dict, node_base_namespace, models_lib_path):
+    def __init__(self, ai_dict, pub_sub_namespace, models_lib_path):
       #rospy.logwarn("Darknet IF got ai_dict: " + str(ai_dict))
-      if node_base_namespace[-1] == "/":
-        node_base_namespace = node_base_namespace[:-1]
-      self.node_base_namespace = node_base_namespace
+      if pub_sub_namespace[-1] == "/":
+        pub_sub_namespace = pub_sub_namespace[:-1]
+      self.pub_sub_namespace = pub_sub_namespace
       self.models_lib_path = models_lib_path
       self.pkg_name = ai_dict['pkg_name']
       self.node_name = ai_dict['node_name']
@@ -51,9 +51,6 @@ class DarknetAIF(object):
       self.models_folder = ai_dict['models_folder']
       self.models_folder_path =  os.path.join(self.models_lib_path, self.models_folder)
       #rospy.logwarn("Darknet models path: " + self.models_folder_path)
-      threshold_namespace = self.node_base_namespace + '/' + self.node_name + '/set_threshold'
-      self.set_threshold_pub = rospy.Publisher(threshold_namespace, Float32, queue_size=1, latch=True)
-
 
     
     #################
@@ -120,7 +117,7 @@ class DarknetAIF(object):
         launch_cmd_line = [
             "roslaunch", self.pkg_name, self.launch_file,
             "pkg_name:=" + self.pkg_name,
-            "namespace:=" + self.node_base_namespace, 
+            "namespace:=" + self.pub_sub_namespace, 
             "node_name:=" + self.node_name,
             "node_file:=" + self.node_file,
             "yolo_weights_path:=" + os.path.join(self.models_folder_path, "yolo_network_config/weights"),
@@ -149,10 +146,6 @@ class DarknetAIF(object):
         self.current_img_topic = "None"
         
         #self.current_threshold = 0.3
-
-    def updateClassifierThreshold(self,threshold):
-        self.set_threshold_pub.publish(threshold)
-
 
     
 
