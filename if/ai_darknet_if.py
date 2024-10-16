@@ -36,7 +36,13 @@ AI_DICT = dict(
     model_prefix = 'darknet_',
 )
 
+
+
+
 class DarknetAIF(object):
+    FIXED_LOADING_START_UP_TIME_S = 5.0 # Total guess
+    ESTIMATED_WEIGHT_LOAD_RATE_BYTES_PER_SECOND = 16000000.0 # Very roughly empirical based on YOLOv3
+
     def __init__(self, ai_dict, pub_sub_namespace, models_lib_path):
       #rospy.logwarn("Darknet IF got ai_dict: " + str(ai_dict))
       if pub_sub_namespace[-1] == "/":
@@ -105,6 +111,8 @@ class DarknetAIF(object):
                 model_dict = dict()
                 model_dict['name'] = name
                 model_dict['size'] = classifier_size_list[i]
+                load_time = self.FIXED_LOADING_START_UP_TIME_S + (classifier_size_list[i] / self.ESTIMATED_WEIGHT_LOAD_RATE_BYTES_PER_SECOND)
+                model_dict['load_time'] =  load_time
                 model_dict['classes'] = classifier_classes_list[i]
                 models_dict[model_name] = model_dict
             #rospy.logwarn("Classifier returning models dict" + str(models_dict))
