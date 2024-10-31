@@ -24,19 +24,7 @@ from nepi_edge_sdk_base.save_cfg_if import SaveCfgIF
 
 
 AI_NAME = 'Darknet' # Use in display menus
-FILE_TYPE = 'AIF'
-AI_DICT = dict(
-    description = 'Darknet ai framework support',
-    pkg_name = 'nepi_darknet_ros',
-    class_name = 'DarknetAIF',
-    node_file = 'nepi_darknet_ros',
-    node_name = 'darknet_ros',
-    launch_file = 'darknet_ros.launch',
-    models_folder = 'darknet_ros',
-    model_prefix = 'darknet_',
-)
-
-
+FILE_TYPE = 'AIF_IF'
 
 
 class DarknetAIF(object):
@@ -51,10 +39,10 @@ class DarknetAIF(object):
       self.models_lib_path = models_lib_path
       self.pkg_name = ai_dict['pkg_name']
       self.node_name = ai_dict['node_name']
-      self.node_file = ai_dict['node_file']
-      self.launch_file = ai_dict['launch_file']
+      self.node_file = ai_dict['node_file_name']
+      self.launch_file = ai_dict['launch_file_name']
       self.model_prefix = ai_dict['model_prefix']
-      self.models_folder = ai_dict['models_folder']
+      self.models_folder = ai_dict['models_folder_name']
       self.models_folder_path =  os.path.join(self.models_lib_path, self.models_folder)
       #rospy.logwarn("Darknet models path: " + self.models_folder_path)
 

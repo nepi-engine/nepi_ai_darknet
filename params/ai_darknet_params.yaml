@@ -1,0 +1,10 @@
+description: Darknet ai framework support
+pkg_name: nepi_ai_darknet
+if_file_name: ai_darknet_if.py
+if_module_name: ai_darknet_if
+if_class_name: DarknetAIF
+node_file_name: nepi_darknet_ros
+node_name: darknet_ros
+launch_file_name: darknet_ros.launch
+models_folder_name: darknet_ros
+model_prefix: darknet_

@@ -101,13 +101,17 @@ project(nepi_ai_darknet)
 #)
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
-set( NEPI_AI_IF_FOLDER 
+set( NEPI_AIF_SHARE_FOLDER 
   # Must hard-coded 
-  /opt/nepi/ros/share/nepi_ai_ifs
+  /opt/nepi/ros/share/nepi_aifs
+)
+
+install(DIRECTORY params/
+  DESTINATION ${NEPI_AIF_SHARE_FOLDER} 
 )
 
 install(DIRECTORY if/
-  DESTINATION ${NEPI_AI_IF_FOLDER}
+  DESTINATION ${NEPI_AIF_SHARE_FOLDER}  
 )
 
 
