@@ -40,6 +40,7 @@ class DarknetAIF(object):
       self.pkg_name = ai_dict['pkg_name']
       self.node_name = ai_dict['node_name']
       self.node_file = ai_dict['node_file_name']
+      self.launch_pkg = ai_dict['launch_pkg_name']
       self.launch_file = ai_dict['launch_file_name']
       self.model_prefix = ai_dict['model_prefix']
       self.models_folder = ai_dict['models_folder_name']
@@ -111,8 +112,8 @@ class DarknetAIF(object):
         # Build Darknet new classifier launch command
 
         launch_cmd_line = [
-            "roslaunch", self.pkg_name, self.launch_file,
-            "pkg_name:=" + self.pkg_name,
+            "roslaunch", self.launch_pkg, self.launch_file,
+            "pkg_name:=" + self.launch_pkg,
             "namespace:=" + self.pub_sub_namespace, 
             "node_name:=" + self.node_name,
             "node_file:=" + self.node_file,
