@@ -108,7 +108,7 @@ class DarknetAIF(object):
             return models_dict
 
 
-    def startClassifier(self, classifier, source_img_topic, threshold):
+    def startClassifier(self, classifier, source_img_topic, threshold, max_rate):
         # Build Darknet new classifier launch command
 
         launch_cmd_line = [
@@ -122,7 +122,8 @@ class DarknetAIF(object):
             "ros_param_file:=" + os.path.join(self.models_folder_path, "config/ros.yaml"),
             "network_param_file:=" + os.path.join(self.models_folder_path, "config", classifier + ".yaml"),
             "input_img:=" + source_img_topic,
-            "detection_threshold:=" + str(threshold)
+            "detection_threshold:=" + str(threshold),
+            "max_rate_hz:=" + str(max_rate)
         ]
         
         rospy.loginfo("Launching Darknet ROS Process: " + str(launch_cmd_line))
