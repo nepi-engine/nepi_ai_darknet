@@ -70,7 +70,7 @@ project(nepi_ai_darknet)
 ## DEPENDS: system dependencies of this project that dependent projects also need
 #catkin_package(
 #  CATKIN_DEPENDS 
-#  DEPENDS CATKIN_DEPENDS sensor_msgs nepi_ros_interfaces nepi_edge_sdk_base 
+#  DEPENDS CATKIN_DEPENDS sensor_msgs nepi_ros_interfaces nepi_sdk 
 #)
 
 

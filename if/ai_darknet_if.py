@@ -28,7 +28,7 @@ import rospy
 import numpy as np
 
 
-from nepi_edge_sdk_base import nepi_ros
+from nepi_sdk import nepi_ros
 
 
 from std_msgs.msg import Empty, Float32
@@ -36,7 +36,7 @@ from nepi_ros_interfaces.msg import ObjectCount
 from nepi_ros_interfaces.srv import ImageClassifierStatusQuery, ImageClassifierStatusQueryResponse
 
 
-from nepi_edge_sdk_base.save_cfg_if import SaveCfgIF
+from nepi_sdk.save_cfg_if import SaveCfgIF
 
 
 AI_NAME = 'Darknet' # Use in display menus
