@@ -7,16 +7,14 @@ This file is part of nepi-engine
 License: 3-clause BSD, see https://opensource.org/licenses/BSD-3-Clause
 ]]
 cmake_minimum_required(VERSION 1.0.0)
-project(nepi_ai_darknet)
+project(nepi_aif_darknet)
 
-## Compile as C++11, supported in ROS Kinetic and newer
-# add_compile_options(-std=c++11)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-#find_package(catkin REQUIRED COMPONENTS
-#	std_msgs
-#)
+find_package(catkin REQUIRED COMPONENTS
+std_msgs
+)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -68,10 +66,9 @@ project(nepi_ai_darknet)
 ## LIBRARIES: libraries you create in this project that dependent projects also need
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
-#catkin_package(
-#  CATKIN_DEPENDS 
-#  DEPENDS CATKIN_DEPENDS sensor_msgs nepi_ros_interfaces nepi_sdk 
-#)
+catkin_package(
+  CATKIN_DEPENDS std_msgs 
+)
 
 
 
@@ -90,15 +87,15 @@ project(nepi_ai_darknet)
 
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
-# catkin_install_python(PROGRAMS
-#   scripts/nepi_ai_darknet_node
-#   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
+ catkin_install_python(PROGRAMS
+   scripts/nepi_ai_darknet_node.py
+   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+ )
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
-#install(DIRECTORY launch/
-#  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
-#)
+install(DIRECTORY launch/
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
+)
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 set( NEPI_AIF_SHARE_FOLDER 
@@ -111,7 +108,7 @@ install(DIRECTORY params/
 )
 
 install(DIRECTORY if/
-  DESTINATION ${NEPI_AIF_SHARE_FOLDER}  
+  DESTINATION ${NEPI_AIF_SHARE_FOLDER}
 )
 
 
