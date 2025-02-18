@@ -25,7 +25,7 @@ import numpy as np
 np.bool = np.bool_
 import pandas
 
-#from darknet import darknet
+import darknet
 
 from nepi_sdk import nepi_ros
 from nepi_sdk import nepi_msg
@@ -87,9 +87,11 @@ class DarknetDetector():
                 rospy.signal_shutdown("Failed to get valid model file paths")
             else:
                 self.classes = model_info['detection_classes']['names']
+                self.img_width = model_info['image_size']['image_width']['value']
+                self.img_height = model_info['image_size']['image_height']['value']
 
                 nepi_msg.publishMsgInfo(self,"Loading model: " + self.node_name)
-                #self.model = darknet.load_net(self.config_file_path, self.weight_file_path, 0)
+                self.model = darknet.load_model(self.config_file_path, self.weight_file_path)
 
                 nepi_msg.publishMsgInfo(self,"Starting ai_if with defualt_config_dict: " + str(self.defualt_config_dict))
                 self.ai_if = AiNodeIF(model_name = self.node_name,
@@ -110,6 +112,23 @@ class DarknetDetector():
 
     def processDetection(self,cv2_img, threshold):
         detect_dict_list = [TEST_DETECTION_DICT_ENTRY]
+
+        frame_rgb = cv2.cvtColor(cv2_img, cv2.COLOR_BGR2RGB)
+        frame_resized = cv2.resize(frame_rgb, (self.img_width, self.img_height),
+                                   interpolation=cv2.INTER_LINEAR)
+        img_for_detect = darknet.make_image(self.img_width, self.img_height, 3)
+        darknet.copy_image_from_bytes(img_for_detect, frame_resized.tobytes())
+
+        prev_time = time.time()
+        detections = darknet.detect_image(network, class_names, img_for_detect, thresh=threshold)
+        fps = 1 / (time.time() - prev_time)
+        nepi_msg.publishMsgInfo(self,"FPS: {:.2f}".format(fps))
+        nepi_msg.publishMsgWarn(self,"Got Detections: " + str(detections))
+
+     
+
+
+
         '''
         # Example image
         #img = 'https://ultralytics.com/images/zidane.jpg'
