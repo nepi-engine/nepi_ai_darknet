@@ -7,7 +7,7 @@ This file is part of nepi-engine
 License: 3-clause BSD, see https://opensource.org/licenses/BSD-3-Clause
 ]]
 cmake_minimum_required(VERSION 1.0.0)
-project(nepi_aif_darknet)
+project(nepi_aif_yolov3)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -88,7 +88,8 @@ catkin_package(
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
  catkin_install_python(PROGRAMS
-   scripts/nepi_ai_darknet_node.py
+   scripts/nepi_ai_yolov3_detection_node.py
+   scripts/darknet.py
    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
  )
 

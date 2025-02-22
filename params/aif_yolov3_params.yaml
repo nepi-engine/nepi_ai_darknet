@@ -1,0 +1,13 @@
+description: Yolov3 ai framework support
+pkg_name: nepi_aif_yolov3
+framework_name: yolov3
+if_file_name: aif_yolov3_if.py
+if_module_name: aif_yolov3_if
+if_class_name: Yolov3AIF
+node_file_dict: 
+  detection: nepi_ai_yolov3_detection_node.py
+launch_pkg_name: nepi_aif_yolov3
+launch_file_name: yolov3_ros.launch
+models_folder_name: yolov3
+model_prefix: yolov3_
+supports_preload: True

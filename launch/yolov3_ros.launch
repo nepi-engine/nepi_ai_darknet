@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<launch>
+  <!-- Console launch prefix -->
+  <arg name="pkg_name" default="nepi_aif_yolo3"/>
+  <arg name="node_name" default="yolov3_common_object_detection"/>
+  <arg name="node_namespace" default="/nepi" />
+  <arg name="node_file_name" default=""/>
+  <arg name="launch_prefix" default=""/>
+  <arg name="mgr_namespace" default="" />
+
+  <!-- Set paths. -->
+  <arg name="param_file_path"          default="/mnt/nepi_storage/ai_models/yolov3/common_object_detection.yaml"/>
+  <arg name="weight_file_path"          default=""/>
+  <arg name="config_file_path"           default=""/>
+
+  <!-- Load parameters -->
+  <rosparam command="load" ns="$(arg node_namespace)/$(arg node_name)" file="$(arg param_file_path)"/>
+
+  <!-- Start yolov3 and ros wrapper -->
+  <node pkg="$(arg pkg_name)" ns="$(arg node_namespace)" type="$(arg node_file_name)" name="$(arg node_name)" output="screen" launch-prefix="$(arg launch_prefix)">
+    <param name="weight_file_path"          value="$(arg weight_file_path)" />
+    <param name="config_file_path"           value="$(arg config_file_path)" />
+    <param name="mgr_namespace"   value="$(arg mgr_namespace)" />
+  </node>
+
+</launch>
+

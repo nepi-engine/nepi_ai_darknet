@@ -107,22 +107,22 @@ def class_colors(names):
         random.randint(0, 255)) for name in names}
 
 
-def load_model(config_file, weight_file, batch_size=1):
+def load_network(config_file, weight_file, batch_size=1):
     network = load_net_custom(
         config_file.encode("ascii"),
         weight_file.encode("ascii"), 0, batch_size)
-    return model
+    return network
 
-
+'''
 def load_network(config_file, data_file, weights, batch_size=1):
     """
-    load model description and weights from config files
+    load network description and weights from config files
     args:
-        config_file (str): path to .cfg model file
-        data_file (str): path to .data model file
+        config_file (str): path to .cfg network file
+        data_file (str): path to .data network file
         weights (str): path to weights
     returns:
-        network: trained model
+        network: trained network
         class_names
         class_colors
     """
@@ -133,7 +133,7 @@ def load_network(config_file, data_file, weights, batch_size=1):
     class_names = [metadata.names[i].decode("ascii") for i in range(metadata.classes)]
     colors = class_colors(class_names)
     return network, class_names, colors
-
+'''
 
 def print_detections(detections, coordinates=False):
     print("\nObjects:")
@@ -264,7 +264,7 @@ def detect_image(network, class_names, image, thresh=.5, hier_thresh=.5, nms=.45
 
 if os.name == "posix":
     cwd = os.path.dirname(__file__)
-    lib = ct.CDLL(cwd + "/libdarknet.so", ct.RTLD_GLOBAL)
+    lib = ct.CDLL("/usr/lib/libdarknet.so", ct.RTLD_GLOBAL)
 elif os.name == "nt":
     cwd = os.path.dirname(__file__)
     os.environ["PATH"] = os.path.pathsep.join((cwd, os.environ["PATH"]))

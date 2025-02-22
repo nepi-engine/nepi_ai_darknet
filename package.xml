@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>nepi_aif_darknet</name>
+  <name>nepi_aif_yolov3</name>
   <version>0.0.0</version>
-  <description>Files for nepi darknet ai framework support</description>
+  <description>Files for nepi yolov3 ai framework support</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->
