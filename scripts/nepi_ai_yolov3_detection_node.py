@@ -89,6 +89,7 @@ class Yolov3Detector():
                 rospy.signal_shutdown("Failed to get valid model file paths")
             else:
                 try: 
+                    model_framework = model_info['framework']['name']
                     model_type = model_info['type']['name']
                     model_description = model_info['description']['name']
                     self.classes = model_info['classes']['names']
@@ -98,9 +99,9 @@ class Yolov3Detector():
                     nepi_msg.publishMsgWarn(self,"Failed to get required model info from params: " + str(e))
                     rospy.signal_shutdown("Failed to get valid model file paths")
 
-                if model_type != 'yolov3':
-                    nepi_msg.publishMsgWarn(self,"Model not a valid type: " + model_type)
-                    rospy.signal_shutdown("Model not a valid type")
+                if model_framework != 'yolov3':
+                    nepi_msg.publishMsgWarn(self,"Model not a yolov3 model: " + model_framework)
+                    rospy.signal_shutdown("Model not a valid framework")
 
                 nepi_msg.publishMsgInfo(self,"Loading model: " + self.node_name)
                 self.model = darknet.load_network(self.config_file_path, self.weight_file_path)
@@ -110,9 +111,9 @@ class Yolov3Detector():
 
                 nepi_msg.publishMsgInfo(self,"Starting ai_if with defualt_config_dict: " + str(self.defualt_config_dict))
                 self.ai_if = AiDetectorIF(model_name = self.node_name,
-                                    model_description = model_description
-                                    img_height_px = self.img_height,
-                                    img_width_px = self.img_width,
+                                    model_description = model_description,
+                                    img_height = self.img_height,
+                                    img_width = self.img_width,
                                     classes_list = self.classes,
                                     defualt_config_dict = self.defualt_config_dict,
                                     all_namespace = self.all_namespace,
