@@ -129,52 +129,48 @@ class Yolov3Detector():
 
 
     def processDetection(self,cv2_img, threshold):
+        start_time = time.time()
         #detect_dict_list = [TEST_DETECTION_DICT_ENTRY]
         cv2_shape = cv2_img.shape
         cv2_img_width = cv2_shape[1] 
         cv2_img_height = cv2_shape[0] 
         cv2_img_area = cv2_img_width * cv2_img_height
         # Convert the image
-        prev_time = time.time()
         frame_rgb = cv2.cvtColor(cv2_img, cv2.COLOR_BGR2RGB)
         frame_resized = cv2.resize(frame_rgb, (self.model_img_width, self.model_img_height),
                                    interpolation=cv2.INTER_LINEAR)
         img_for_detect = darknet.make_image(self.model_img_width, self.model_img_height, 3)
         darknet.copy_image_from_bytes(img_for_detect, frame_resized.tobytes())
-        convert_time = (time.time() - prev_time)
-        #nepi_msg.publishMsgInfo(self,"Convet Time: {:.2f}".format(convert_time))        
-
+      
         # Run Detection
-        prev_time = time.time()
         detections = darknet.detect_image(self.model, self.classes, img_for_detect, thresh=threshold)
-        detect_time = (time.time() - prev_time)
-        #nepi_msg.publishMsgInfo(self,"Detect Time: {:.2f}".format(detect_time))
-        #nepi_msg.publishMsgInfo(self,"Detections: " + str(detections))
+        #nepi_msg.publishMsgWarn(self,"Detections: " + str(detections))
         detect_dict_list = []
         for label, confidence, bbox in detections:
             det_name = label
             det_id = self.classes.index(det_name)
             det_prob = float(confidence) / 100.0
-            #det_box = self.convert2original(cv2_img, bbox, self.model_img_height, self.model_img_width)
-            det_box = self.convert4cropping(cv2_img, bbox, self.model_img_height, self.model_img_width)
+            det_box = self.convert2original(cv2_img, bbox, self.model_img_height, self.model_img_width)
+            #det_box = self.convert4cropping(cv2_img, bbox, self.model_img_height, self.model_img_width)
             detect_dict = {
                 'name': str(label), # Class String Name
                 'id': det_id, # Class Index from Classes List
                 'uid': '', # Reserved for unique tracking by downstream applications
                 'prob': det_prob, # Probability of detection
-                'xmin': det_box[0]-int(det_box[2]/2),
-                'ymin': det_box[1]-int(det_box[3]/2) ,
-                'xmax': det_box[0] + int(det_box[2]/2),
-                'ymax': det_box[1] + int(det_box[3]/2),
+                'xmin': det_box[0]-int(det_box[2]/2.),
+                'ymin': det_box[1]-int(det_box[3]/2.) ,
+                'xmax': det_box[0] + int(det_box[2]/2.),
+                'ymax': det_box[1] + int(det_box[3]/2.),
                 'width_pixels': cv2_img_width,
                 'height_pixels': cv2_img_height,
                 'area_pixels': det_box[2] * det_box[3],
-                'area_ratio': (det_box[2] * det_box[3]) / cv2_img_area,
+                'area_ratio': (det_box[2] * det_box[3]) / cv2_img_area
             }
             detect_dict_list.append(detect_dict)
             #nepi_msg.publishMsgInfo(self,"Got detect dict entry: " + str(detect_dict))
-
-        return detect_dict_list
+        detect_time = round( (time.time() - start_time) , 3)
+        #nepi_msg.publishMsgInfo(self,"Detect Time: {:.2f}".format(detect_time))
+        return detect_dict_list, detect_time
 
 
 
