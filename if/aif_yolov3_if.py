@@ -38,8 +38,6 @@ from nepi_sdk import nepi_msg
 from std_msgs.msg import Empty, Float32, Int32, String, Bool
 
 
-from nepi_sdk.save_cfg_if import SaveCfgIF
-
 
 TEST_AI_DICT = {
 'description': 'Yolov3 ai framework support', 
