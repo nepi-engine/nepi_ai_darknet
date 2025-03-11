@@ -28,7 +28,7 @@ import darknet
 
 from nepi_sdk import nepi_ros
 from nepi_sdk import nepi_msg
-from nepi_sdk import nepi_ais
+from nepi_sdk import nepi_img
 
 from nepi_sdk.ai_detector_if import AiDetectorIF
 
@@ -130,16 +130,17 @@ class Yolov3Detector():
 
     def preprocessImage(self,cv2_img,options_dict):
         height, width = cv2_img.shape[:2]
-
+        
         # For Future
         '''
         tile = False
         if 'tile'  in options_dict.keys():
             tile = options_dict['tile']
         '''
+        cv2_img = nepi_img.resize_proportionally(cv2_img, self.proc_img_width,self.proc_img_height,interp = cv2.INTER_NEAREST)
 
         # Convert BW image to RGB
-        if cv2_img.shape[2] != 3:
+        if nepi_img.is_gray(cv2_img):
             cv2_img = cv2.cvtColor(cv2_img, cv2.COLOR_GRAY2BGR)
 
         # Create image dict with new image
